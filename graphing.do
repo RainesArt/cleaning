@@ -13,7 +13,6 @@ use "cleaned.dta", clear
 
 cd /Users/jasminesun/Desktop/ECREACH/cleaning_task/graphs
 
-
 * Exploring distribution of cummulative score 
 kdensity cummulative_score
 
@@ -51,6 +50,23 @@ graph save "read_by_age_box.gph", replace
 
 ** Looking at high achiever percentage by age
 tab age high_achiever, row 
+
+** Looking at high achiever percentage by race
+tab race high_achiever, row 
+
+** Looking at verbal skills by race 
+graph box verbal_skills_one, over(race) ///
+	title("1st Verbal Skills By Race")
+
+graph save "verbal_one_race_box.gph", replace
+
+
+graph box verbal_skills_avg, over(race) ///
+	title("Avg Verbal Skills By Race")
+
+graph save "verbal_avg_race_box.gph", replace
+
+
 
 
 
