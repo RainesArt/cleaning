@@ -1,11 +1,12 @@
 // Testing the usage of `putdocx' to automate the .docx codebook generation process using RR 2016 dataset
 
 cap log close
+
 cd /Users/jasminesun/Desktop/ECREACH/codebook_gen/
 
 
 // Start by writing a program to specify what information we want to see for each variable
-// Seperate program for ID, str categorical, numeric categorical and continuous numeric variables 
+// Seperate program for ID, str categorical, and continuous numeric variables 
 
 	// Program to produce codebook for continuous numeric variables
 		cap program drop codebook_cont_num
@@ -42,8 +43,7 @@ cd /Users/jasminesun/Desktop/ECREACH/codebook_gen/
 				putdocx table cb_`var'(4,2) = ("SD: `sd'")	
 				putdocx table cb_`var'(5,2) = ("Range: [`min', `max' ]")	
 				
-			// Placeholders for description, recoding/cleaning info
-			// This could be enetered manually after the summary stats for all variables are exported
+			// Placeholders for variable description and variable caveats
 			putdocx paragraph
 			putdocx text ("Variable Description"), bold
 			putdocx paragraph
@@ -57,7 +57,7 @@ cd /Users/jasminesun/Desktop/ECREACH/codebook_gen/
 				
 		end
 		
-		// User-written program to produce codebook for categorical var		
+		// Program to produce codebook for categorical variables	
 		cap program drop codebook_cat_str
 		program define codebook_cat_str
 		
@@ -100,8 +100,7 @@ cd /Users/jasminesun/Desktop/ECREACH/codebook_gen/
 					local i = `i' + 1
 				}
 				
-			// Placeholders for description, recoding/cleaning info
-			// This could be enetered manually after the summary stats for all variables are exported
+			// Placeholders for variable description and variable caveats
 			putdocx paragraph
 			putdocx text ("Variable Description"), bold
 			putdocx paragraph
@@ -141,14 +140,13 @@ cd /Users/jasminesun/Desktop/ECREACH/codebook_gen/
 			putdocx table cb_`var'(1,2) = ("N non-missing: `n_nonmiss'")
 			putdocx table cb_`var'(2,2) = ("N missing: `n_miss'")
 			
-			* Calculate and put the number of unique values
-			*quietly levelsof `var', local(unique_vals)
+			// Attempt to calculate and put the number of unique values was causing errors, so commented out for now
+			* quietly levelsof `var', local(unique_vals)
 			*local num_unique = word count `unique_vals'
 			* putdocx table cb_`var'(3,2) = ("Number of Unique Values: `num_unique'")
 			
 			
-			* Placeholders for description, recoding/cleaning info
-			* Could be entered manually after the summary stats for all variables are exported
+			// Placeholders for variable description and variable caveats
 			putdocx paragraph
 			putdocx text ("Variable Description"), bold
 			putdocx paragraph
@@ -196,8 +194,10 @@ local numeric_vars `r(varlist)'
 // Two for loops that iterates through list of string variables, then list of numeric variables
 	* Inner for loop iterates through each variable in id_variables to check for matches
 		* If it's in id_variables, then run codebook_id program 
-		* Else run associated program
-
+		* Otherwise run associated program
+			/* Code could be reworked so that codebook for ID variables are first generated,
+			but for now, variable codebook is generated in order that variables are listed. */
+			
 
 	foreach var of local string_vars {
 		// Initialize a flag
@@ -212,7 +212,6 @@ local numeric_vars `r(varlist)'
 		
 		// Run the codebook_cat_str program if the variable is not in the id_variables list
 		if `is_id' == 0 {
-			display "Processing string variable: `var'"
 			codebook_cat_str `var'
 		} 
 		else {
@@ -233,7 +232,6 @@ local numeric_vars `r(varlist)'
 		
 		// Run the codebook_cat_str program if the variable is not in the id_variables list
 		if `is_id' == 0 {
-			display "Processing numeric variable: `var'"
 			codebook_cont_num `var'
 		} 
 		else {
@@ -241,7 +239,7 @@ local numeric_vars `r(varlist)'
 		}
 	}
 
-	// Want to automate naming convention based on dataset name
+	// Was hoping to eventually automate naming convention based on dataset name, but is manual for now
 	putdocx save RR2016_codebook, replace
 
 			
